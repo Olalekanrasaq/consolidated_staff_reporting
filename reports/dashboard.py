@@ -3,10 +3,21 @@ from streamlit_gsheets import GSheetsConnection
 
 # Create a connection object.
 conn = st.connection("gsheets", type=GSheetsConnection)
-df_transc_today = conn.read(worksheet="weekly_transc_today", ttl=43200)
-df_ntt_today = conn.read(worksheet="ntt_today", ttl=43200)
-df_transc_yest = conn.read(worksheet="weekly_transc_yest", ttl=43200)
-df_ntt_yest = conn.read(worksheet="ntt_yesterday", ttl=43200)
+
+@st.cache_data(ttl=43200)
+def load_data():
+    return {
+        "transc_today": conn.read(worksheet="weekly_transc_today"),
+        "ntt_today": conn.read(worksheet="ntt_today"),
+        "transc_yest": conn.read(worksheet="weekly_transc_yest"),
+        "ntt_yest": conn.read(worksheet="ntt_yesterday"),
+    }
+
+data = load_data()
+df_transc_today = data["transc_today"]
+df_ntt_today = data["ntt_today"]
+df_transc_yest = data["transc_yest"]
+df_ntt_yest = data["ntt_yest"]
 
 st.title("📊 Dashboard")
 

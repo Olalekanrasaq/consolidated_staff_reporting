@@ -14,13 +14,14 @@ def load_users():
 
 loans_df = load_loans()
 users_df = load_users()
+current_staff = st.session_state.get("staff_name")
 
 st.title("🎴 Loans Management")
 
 st.write("This is the Loans management tool. Here you can manage your loans.")
 
-def insert_cards(loan_data):
-    # Implementation for inserting cards into google sheet
+def insert_loan(loan_data):
+    # Implementation for inserting loans into google sheet
     new_loan_df = pd.DataFrame([loan_data])
     updated_df = pd.concat([loans_df, new_loan_df], ignore_index=True)
     conn.update(worksheet="loans", data=updated_df)
@@ -28,7 +29,7 @@ def insert_cards(loan_data):
 
 with st.form("add_loan_form"):
     DateSold = st.date_input("Date Sold")
-    Staff_name = st.selectbox("Staff Name", options=users_df["Staff_name"].tolist())
+    st.text_input("Staff Name", value=current_staff, disabled=True)
     CustomerName = st.text_input("Customer Name")
     CustomerPhone = st.text_input("Customer Phone Number")
     Location = st.text_input("Location")
@@ -40,13 +41,13 @@ with st.form("add_loan_form"):
 if submitted:
     loan_data = {
     "DateSold": DateSold,
-    "Staff_name": Staff_name,
+    "Staff_name": current_staff,
     "CustomerName": CustomerName,
     "CustomerPhone": CustomerPhone,
     "Location": Location,
     "BusinessName": BusinessName,
     "LoanAmount": LoanAmount
 }
-    insert_cards(loan_data)
+    insert_loan(loan_data)
     
 

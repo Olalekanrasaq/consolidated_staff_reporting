@@ -2,10 +2,6 @@ import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 from streamlit_cookies_manager import EncryptedCookieManager
 
-st.set_page_config(
-    layout="wide"
-)
-
 cookies = EncryptedCookieManager(
     prefix="francojay_",
     password="12345"
@@ -42,6 +38,7 @@ def login():
         for user in users:
             if username == user["Username"] and password == user["Password"]:
                 st.session_state.logged_in = True
+                st.session_state.staff_name = user["Staff_name"]
 
                 # ✅ Persist login
                 cookies["logged_in"] = "true"
@@ -70,10 +67,15 @@ logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
 dashboard = st.Page("reports/dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True)
 staffs = st.Page("reports/staffs.py", title="Staff reports", icon=":material/add_moderator:")
 
+bo_retention = st.Page("tasks/bo_retention.py", title="BO Retention", icon=":material/account_circle:")
+ntt = st.Page("tasks/ntt.py", title="Non-Transacting Terminals", icon=":material/add_alert:")
+terminal_activity = st.Page("tasks/terminal_activity.py", title="Terminal Activity", icon=":material/ad_units:")
+
 
 cards = st.Page("tools/cards.py", title="Cards", icon=":material/card_giftcard:")
 loans = st.Page("tools/loan.py", title="Loans", icon=":material/sell:")
 moniebooks = st.Page("tools/moniebook.py", title="Moniebooks", icon=":material/computer:")
+terminals = st.Page("tools/terminal.py", title="Terminal Activation", icon=":material/sell:")
 admin = st.Page("tools/admin.py", title="Admin", icon=":material/admin_panel_settings:")
 
 if st.session_state.logged_in:
@@ -81,7 +83,8 @@ if st.session_state.logged_in:
         {
             "Account": [logout_page],
             "Reports": [dashboard, staffs],
-            "Tools": [cards, loans, moniebooks, admin],
+            "Tasks": [bo_retention, ntt, terminal_activity],
+            "Tools": [cards, loans, moniebooks, terminals, admin],
         }
     )
 else:

@@ -14,6 +14,7 @@ def load_users():
 
 cards_df = load_cards()
 users_df = load_users()
+current_staff = st.session_state.get("staff_name")
 
 st.title("🎴 Cards Management")
 
@@ -28,7 +29,7 @@ def insert_cards(card_data):
 
 with st.form("add_card_form"):
     DateSold = st.date_input("Date Sold")
-    Staff_name = st.selectbox("Staff Name", options=users_df["Staff_name"].tolist())
+    st.text_input("Staff Name", value=current_staff, disabled=True)
     CustomerName = st.text_input("Customer Name")
     CustomerPhone = st.text_input("Customer Phone Number")
     CustomerAccount = st.text_input("Customer Account Number")
@@ -40,7 +41,7 @@ with st.form("add_card_form"):
 if submitted:
     card_data = {
         "DateSold": DateSold,
-        "Staff_name": Staff_name,
+        "Staff_name": current_staff,
         "CustomerName": CustomerName,
         "CustomerPhone": CustomerPhone,
         "CustomerAccount": CustomerAccount,
