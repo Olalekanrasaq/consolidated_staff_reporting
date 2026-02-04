@@ -33,7 +33,7 @@ if "is_admin" not in st.session_state:
 secret_code = st.text_input("Enter admin secret code:", type="password")
 
 if st.button("Submit"):
-    if secret_code != "1234":
+    if secret_code != "123@4":
         st.error("Unauthorized access.")
     else:
         st.session_state.is_admin = True
