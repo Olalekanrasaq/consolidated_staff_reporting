@@ -1,51 +1,33 @@
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
-
-# Create a connection object.
-conn = st.connection("gsheets", type=GSheetsConnection)
-
-@st.cache_data(ttl=43200)
-def load_data():
-    return {
-        "transc_today": conn.read(worksheet="weekly_transc_today"),
-        "ntt_today": conn.read(worksheet="ntt_today"),
-        "transc_yest": conn.read(worksheet="weekly_transc_yest"),
-        "ntt_yest": conn.read(worksheet="ntt_yesterday"),
-    }
+from data.loader import load_data
 
 data = load_data()
-df_transc_today = data["transc_today"]
-df_ntt_today = data["ntt_today"]
-df_transc_yest = data["transc_yest"]
-df_ntt_yest = data["ntt_yest"]
+df_transc_today = data["df_transc_today"]
+df_ntt_today = data["df_ntt_today"]
+df_transc_yest = data["df_transc_yest"]
+df_ntt_yest = data["df_ntt_yest"]
+bo_retention_today = data["bo_retention_today"]
+bo_retention_yest = data["bo_retention_yest"]
 
 st.title("📊 Dashboard")
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 with col1:
-    with st.container(border=True):
-        st.metric(":material/list_alt: Total Businesses", value=len(df_transc_today), 
-                  delta=len(df_transc_today) - len(df_transc_yest))
-
-with col2:
-    with st.container(border=True):
-        st.metric(":material/thumb_down_alt: Non-Transacting Terminals", value=len(df_ntt_today), 
-                  delta=len(df_ntt_today) - len(df_ntt_yest))
-
-_col1, _col2 = st.columns(2)
-with _col1:
-    with st.container(border=True):
-        target_met_today = df_transc_today[df_transc_today["target_met"] == True]
-        target_met_yest = df_transc_yest[df_transc_yest["target_met"] == True]
-        st.metric(":material/upgrade: Businesses with Target Met", value=len(target_met_today), 
-                  delta=len(target_met_today) - len(target_met_yest))
-
-with _col2:
     with st.container(border=True):
         target_not_met_today = df_transc_today[df_transc_today["target_met"] == False]
         target_not_met_yest = df_transc_yest[df_transc_yest["target_met"] == False]
         st.metric(":material/south: Businesses without Target Met", value=len(target_not_met_today), 
-                  delta=len(target_not_met_today) - len(target_not_met_yest))
+                  delta=len(target_not_met_today) - len(target_not_met_yest), delta_color="inverse")
+
+with col2:
+    with st.container(border=True):
+        st.metric(":material/thumb_down_alt: Non-Transacting Terminals", value=len(df_ntt_today), 
+                  delta=len(df_ntt_today) - len(df_ntt_yest), delta_color="inverse")
+
+with col3:
+    with st.container(border=True):
+        st.metric(":material/thumb_down_alt: Declined Top Businesses", value=len(bo_retention_today), 
+                  delta=len(bo_retention_today) - len(bo_retention_yest), delta_color="inverse")
 
 tab_1, tab_2 = st.columns(2)
 with tab_1:

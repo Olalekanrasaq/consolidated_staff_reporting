@@ -1,19 +1,12 @@
 import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
+from data.loader import load_products, load_businesses_users
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-@st.cache_data(ttl=43200)
-def load_terminals():
-    return conn.read(worksheet="terminals")
-
-@st.cache_data(ttl=86400)
-def load_users():
-    return conn.read(worksheet="users")
-
-terminals_df = load_terminals()
-users_df = load_users()
+terminals_df = load_products()["terminals"]
+users_df = load_businesses_users()["users"]
 current_staff = st.session_state.get("staff_name")
 
 st.title("🎴 Terminal Management")

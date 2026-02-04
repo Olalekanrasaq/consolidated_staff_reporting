@@ -1,19 +1,12 @@
 import streamlit as st
 import pandas as pd
+from data.loader import load_products, load_businesses_users
 from streamlit_gsheets import GSheetsConnection
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-@st.cache_data(ttl=43200)
-def load_loans():
-    return conn.read(worksheet="loans")
-
-@st.cache_data(ttl=86400)
-def load_users():
-    return conn.read(worksheet="users")
-
-loans_df = load_loans()
-users_df = load_users()
+loans_df = load_products()["loans"]
+users_df = load_businesses_users()["users"]
 current_staff = st.session_state.get("staff_name")
 
 st.title("🎴 Loans Management")
