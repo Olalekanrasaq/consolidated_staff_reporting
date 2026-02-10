@@ -13,7 +13,8 @@ def load_data():
         "df_transc_yest": conn.read(worksheet="weekly_transc_yest"),
         "df_ntt_yest": conn.read(worksheet="ntt_yesterday"),
         "bo_retention_today": conn.read(worksheet="bo_retention_today"),
-        "bo_retention_yest": conn.read(worksheet="bo_retention_yest")
+        "bo_retention_yest": conn.read(worksheet="bo_retention_yest"),
+        "cr_metrics": conn.read(worksheet="cr_metrics")
     }
 
 @st.cache_data(ttl=86400)
@@ -53,12 +54,20 @@ def assign_staffs(df, staffs):
     return df
 
 @st.cache_data
-def get_ta_task(users, business_df, df_transc_today):
-    ta_data = df_transc_today[df_transc_today["target_met"] == False]
-    target_not_met = ta_data[["Business Name", "days_last_transact"]]
-
+def get_ta_task(users, business_df, df_transc_today, ntt_today):
+    ta_data = df_transc_today[df_transc_today["target_met"] == False] 
+    target_not_met = ta_data[["Business Name", "days_last_transact", "payment_vol", "payment_value"]]
+    
+    ntt_today['business_key'] = ntt_today['Business Name'].str.lower().str.strip()
     business_df["business_key"] = business_df["Business"].str.lower().str.strip()
     target_not_met["business_key"] = target_not_met["Business Name"].str.lower().str.strip()
+
+    target_not_met = (
+    target_not_met[
+        ~target_not_met['business_key'].isin(ntt_today['business_key'])
+    ]
+    .drop_duplicates(subset=['Business Name'])
+    )
 
     merged_df = target_not_met.merge(
         business_df[["business_key", "Phone"]],

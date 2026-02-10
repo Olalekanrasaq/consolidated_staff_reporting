@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from data.loader import load_data, load_businesses_users, load_assigned_tasks, load_products
 from functools import reduce
+from streamlit_gsheets import GSheetsConnection
 
 assigned_ta_tasks = load_assigned_tasks()["assigned_ta_tasks"]
 assigned_retention_tasks = load_assigned_tasks()["assigned_retention_tasks"]
@@ -117,10 +118,26 @@ with col4:
         st.metric(":material/card_giftcard: Total Cards", f"{len(cards)}")
 
 st.caption(":material/addchart: :green[Staff Performance Summary]")
-st.dataframe(summarized_df[cols], hide_index=True, use_container_width=True)
+st.dataframe(summarized_df[cols], 
+             column_config={
+                     "TA_CR": st.column_config.NumberColumn(
+                         "TA_CR (%)",
+                         format="%.0f"
+                     ),
+                     "Retention_CR": st.column_config.NumberColumn(
+                         "Ret_CR (%)",
+                         format="%.0f"
+                     ),
+                     "NTT_CR": st.column_config.NumberColumn(
+                         "NTT_CR (%)",
+                         format="%.0f"
+                     )
+                 },
+             hide_index=True, use_container_width=True)
 
 # get staffs scores based on summarized df
 count_metrics = ["Loans", "Moniebooks", "Terminals", "Cards"]
+count_metrics_data = ["Staff_name", "Loans", "Moniebooks", "Terminals", "Cards"]
 
 df_pct = summarized_df.copy()
 
@@ -132,12 +149,50 @@ for col in count_metrics:
         df_pct[col] = 0
 
 cr_metrics = ["TA_CR", "Retention_CR", "NTT_CR"]
+cr_metrics_data = ["Staff_name", "TA_CR", "Retention_CR", "NTT_CR"]
+
+@st.cache_data
+def update_cr_metrics():
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    cr_metrics_df = load_data()["cr_metrics"]
+    new_df = summarized_df[cr_metrics_data]
+    combined_metrics_df = pd.concat([cr_metrics_df, new_df], ignore_index=True)
+    agg_metrics = combined_metrics_df.groupby('Staff_name', as_index=False).mean()
+    conn.update(worksheet="cr_metrics", data=agg_metrics)
+    return agg_metrics
+
+agg_metrics = update_cr_metrics()
+
+df_pct_merged = df_pct[count_metrics_data].merge(
+    agg_metrics,
+    on='Staff_name',
+    how='inner'
+)
 
 score_columns = count_metrics + cr_metrics
 
-df_pct["Total_Score"] = df_pct[score_columns].sum(axis=1)
-final_df = df_pct[["Staff_name"] + score_columns + ["Total_Score"]]
-final_df = final_df.sort_values(by="Total_Score", ascending=False).reset_index(drop=True)
+df_pct_merged["Total_Score"] = df_pct_merged[score_columns].sum(axis=1)
+# final_df = df_pct_merged[["Staff_name"] + score_columns + ["Total_Score"]]
+final_df = df_pct_merged.sort_values(by="Total_Score", ascending=False).reset_index(drop=True)
 
 with st.expander("Staff Performance Point Ranking (Percentage)"):
-    st.dataframe(final_df, hide_index=True, use_container_width=True)
+    st.dataframe(final_df, 
+                 column_config={
+                     "TA_CR": st.column_config.NumberColumn(
+                         "TA_CR (%)",
+                         format="%.0f"
+                     ),
+                     "Retention_CR": st.column_config.NumberColumn(
+                         "Ret_CR (%)",
+                         format="%.0f"
+                     ),
+                     "NTT_CR": st.column_config.NumberColumn(
+                         "NTT_CR (%)",
+                         format="%.0f"
+                     ),
+                     "Total_Score": st.column_config.NumberColumn(
+                         "Total Score",
+                         format="%.0f"
+                     )
+                 },
+                 hide_index=True, use_container_width=True)

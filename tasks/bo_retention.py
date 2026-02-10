@@ -23,6 +23,3 @@ st.dataframe(
     hide_index=True,
     use_container_width=True
 )
-
-
-
