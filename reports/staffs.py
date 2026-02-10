@@ -15,6 +15,7 @@ cards = load_products()["cards"]
 df_transc_today = load_data()["df_transc_today"]
 df_ntt_today = load_data()["df_ntt_today"]
 bo_retention_today = load_data()["bo_retention_today"]
+cr_metrics_df = load_data()["cr_metrics"]
 
 
 
@@ -154,7 +155,6 @@ cr_metrics_data = ["Staff_name", "TA_CR", "Retention_CR", "NTT_CR"]
 @st.cache_data
 def update_cr_metrics():
     conn = st.connection("gsheets", type=GSheetsConnection)
-    cr_metrics_df = load_data()["cr_metrics"]
     new_df = summarized_df[cr_metrics_data]
     combined_metrics_df = pd.concat([cr_metrics_df, new_df], ignore_index=True)
     agg_metrics = combined_metrics_df.groupby('Staff_name', as_index=False).mean()
