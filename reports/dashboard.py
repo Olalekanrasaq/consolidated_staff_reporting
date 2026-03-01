@@ -8,6 +8,7 @@ df_transc_yest = data["df_transc_yest"]
 df_ntt_yest = data["df_ntt_yest"]
 bo_retention_today = data["bo_retention_today"]
 bo_retention_yest = data["bo_retention_yest"]
+target_businesses = data["target_business_nos"]
 
 st.title("📊 Dashboard")
 
@@ -41,3 +42,7 @@ with tab_2:
         st.caption("Top 5 Businesses by Weekly Payment Value")
         top_5_value = df_transc_today.nlargest(5, "payment_value")
         st.dataframe(top_5_value[["Business Name", "payment_value"]], hide_index=True)
+
+
+with st.expander("Businesses with target met")
+    st.dataframe(target_businesses, hide_index=True)
