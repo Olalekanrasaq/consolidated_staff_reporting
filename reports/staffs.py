@@ -92,9 +92,9 @@ summarized_df = reduce(
     dfs_to_merge
 ).fillna(0)
 
-summarized_df["TA_CR"] = summarized_df["Completed_TA_Tasks"]
-summarized_df["Retention_CR"] = summarized_df["Completed_Retention_Tasks"]
-summarized_df["NTT_CR"] = summarized_df["Completed_NTT_Tasks"]
+summarized_df["TA_CR"] = (summarized_df["Assigned_Tasks"] - summarized_df["Completed_TA_Tasks"])
+summarized_df["Retention_CR"] = (summarized_df["Assigned_Retention_Tasks"] - summarized_df["Completed_Retention_Tasks"])
+summarized_df["NTT_CR"] = (summarized_df["Assigned_NTT_Tasks"] - summarized_df["Completed_NTT_Tasks"])
 
 # remove okunlola francis from summarized df
 summarized_df = summarized_df[summarized_df["Staff_name"] != "Okunlola Francis"]
