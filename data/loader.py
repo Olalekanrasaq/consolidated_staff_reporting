@@ -14,7 +14,8 @@ def load_data():
         "df_ntt_yest": conn.read(worksheet="ntt_yesterday"),
         "bo_retention_today": conn.read(worksheet="bo_retention_today"),
         "bo_retention_yest": conn.read(worksheet="bo_retention_yest"),
-        "cr_metrics": conn.read(worksheet="cr_metrics")
+        "cr_metrics": conn.read(worksheet="cr_metrics"),
+        "target_business_nos": conn.read(worksheet="target_business_nos")
     }
 
 @st.cache_data(ttl=86400)
