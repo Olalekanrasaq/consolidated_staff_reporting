@@ -116,22 +116,7 @@ with col4:
         st.metric(":material/card_giftcard: Total Cards", f"{len(cards)}")
 
 st.caption(":material/addchart: :green[Staff Performance Summary]")
-st.dataframe(summarized_df[cols], 
-             column_config={
-                     "TA_CR": st.column_config.NumberColumn(
-                         "TA_CR (%)",
-                         format="%.0f"
-                     ),
-                     "Retention_CR": st.column_config.NumberColumn(
-                         "Ret_CR (%)",
-                         format="%.0f"
-                     ),
-                     "NTT_CR": st.column_config.NumberColumn(
-                         "NTT_CR (%)",
-                         format="%.0f"
-                     )
-                 },
-             hide_index=True, use_container_width=True)
+st.dataframe(summarized_df[cols], hide_index=True, use_container_width=True)
 
 # get staffs scores based on summarized df
 count_metrics = ["Loans", "Moniebooks", "Terminals", "Cards"]
@@ -168,5 +153,5 @@ df_pct_merged["Total_Score"] = df_pct_merged[score_columns].sum(axis=1)
 # final_df = df_pct_merged[["Staff_name"] + score_columns + ["Total_Score"]]
 final_df = df_pct_merged.sort_values(by="Total_Score", ascending=False).reset_index(drop=True)
 
-with st.expander("Staff Performance Point Ranking (Percentage)"):
+with st.expander("Staff Performance Point Ranking (Absolute)"):
     st.dataframe(final_df, hide_index=True, use_container_width=True)
