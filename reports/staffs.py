@@ -92,12 +92,9 @@ summarized_df = reduce(
     dfs_to_merge
 ).fillna(0)
 
-summarized_df["TA_CR"] = (
-    (summarized_df["Assigned_Tasks"] - summarized_df["Completed_TA_Tasks"])/summarized_df["Assigned_Tasks"]) * 100
-summarized_df["Retention_CR"] = (
-    (summarized_df["Assigned_Retention_Tasks"]- summarized_df["Completed_Retention_Tasks"]) / summarized_df["Assigned_Retention_Tasks"]) * 100
-summarized_df["NTT_CR"] = (
-    (summarized_df["Assigned_NTT_Tasks"] - summarized_df["Completed_NTT_Tasks"]) /summarized_df["Assigned_NTT_Tasks"]) * 100
+summarized_df["TA_CR"] = summarized_df["Completed_TA_Tasks"]
+summarized_df["Retention_CR"] = summarized_df["Completed_Retention_Tasks"]
+summarized_df["NTT_CR"] = summarized_df["Completed_NTT_Tasks"]
 
 # remove okunlola francis from summarized df
 summarized_df = summarized_df[summarized_df["Staff_name"] != "Okunlola Francis"]
@@ -143,11 +140,7 @@ count_metrics_data = ["Staff_name", "Loans", "Moniebooks", "Terminals", "Cards"]
 df_pct = summarized_df.copy()
 
 for col in count_metrics:
-    total = summarized_df[col].sum()
-    if total > 0:
-        df_pct[col] = (summarized_df[col] / total) * 100
-    else:
-        df_pct[col] = 0
+    df_pct[col] = summarized_df[col]
 
 cr_metrics = ["TA_CR", "Retention_CR", "NTT_CR"]
 cr_metrics_data = ["Staff_name", "TA_CR", "Retention_CR", "NTT_CR"]
@@ -157,7 +150,7 @@ def update_cr_metrics():
     conn = st.connection("gsheets", type=GSheetsConnection)
     new_df = summarized_df[cr_metrics_data]
     combined_metrics_df = pd.concat([cr_metrics_df, new_df], ignore_index=True)
-    agg_metrics = combined_metrics_df.groupby('Staff_name', as_index=False).mean()
+    agg_metrics = combined_metrics_df.groupby('Staff_name', as_index=False).sum()
     conn.update(worksheet="cr_metrics", data=agg_metrics)
     return agg_metrics
 
@@ -176,23 +169,4 @@ df_pct_merged["Total_Score"] = df_pct_merged[score_columns].sum(axis=1)
 final_df = df_pct_merged.sort_values(by="Total_Score", ascending=False).reset_index(drop=True)
 
 with st.expander("Staff Performance Point Ranking (Percentage)"):
-    st.dataframe(final_df, 
-                 column_config={
-                     "TA_CR": st.column_config.NumberColumn(
-                         "TA_CR (%)",
-                         format="%.0f"
-                     ),
-                     "Retention_CR": st.column_config.NumberColumn(
-                         "Ret_CR (%)",
-                         format="%.0f"
-                     ),
-                     "NTT_CR": st.column_config.NumberColumn(
-                         "NTT_CR (%)",
-                         format="%.0f"
-                     ),
-                     "Total_Score": st.column_config.NumberColumn(
-                         "Total Score",
-                         format="%.0f"
-                     )
-                 },
-                 hide_index=True, use_container_width=True)
+    st.dataframe(final_df, hide_index=True, use_container_width=True)
