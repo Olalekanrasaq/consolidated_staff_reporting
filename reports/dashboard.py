@@ -44,5 +44,5 @@ with tab_2:
         st.dataframe(top_5_value[["Business Name", "payment_value"]], hide_index=True)
 
 
-with st.expander("Businesses with target met")
+with st.expander("Businesses with target met"):
     st.dataframe(target_businesses, hide_index=True)
