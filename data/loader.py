@@ -118,6 +118,7 @@ def get_ntt_task(users, business_df, df_ntt_today):
 def get_loan_tasks(users, business_df, df_transc_today):
     business_df["business_key"] = business_df["Business"].str.lower().str.strip()
     tm_data = df_transc_today[df_transc_today["target_met"] == True]
+    tm_data = tm_data[['Business Name', 'payment_value', 'payment_vol']]
     tm_data["business_key"] = tm_data["Business Name"].str.lower().str.strip()
     tm_data = tm_data.sample(n=40, replace=False, ignore_index=True)
 
