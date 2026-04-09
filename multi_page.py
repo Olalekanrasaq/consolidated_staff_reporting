@@ -84,7 +84,7 @@ if st.session_state.logged_in:
         {
             "Account": [logout_page],
             "Reports": [dashboard, staffs],
-            "Tasks": [bo_retention, ntt, terminal_activity],
+            "Tasks": [bo_retention, ntt, terminal_activity, loan_task],
             "Tools": [cards, loans, moniebooks, terminals, admin],
         }
     )
