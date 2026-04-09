@@ -12,7 +12,7 @@ df_transc = load_data()["df_transc_today"]
 st.title("Loans Target")
 st.write("Businesses targeted for loans")
 
-merged_df = get_loan_tasks(users, business_df, df_transc_today)
+merged_df = get_loan_tasks(users, business_df, df_transc)
 
 staff_dfs = {
     staff: df.reset_index(drop=True)
