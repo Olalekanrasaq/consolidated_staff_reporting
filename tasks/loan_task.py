@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from data.loader import load_products, load_businesses_users, load_data
+from data.loader import load_products, load_businesses_users, load_data, get_loan_tasks
 from streamlit_gsheets import GSheetsConnection
 
 conn = st.connection("gsheets", type=GSheetsConnection)
