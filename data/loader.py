@@ -113,3 +113,22 @@ def get_ntt_task(users, business_df, df_ntt_today):
     # staffs = users["Staff_name"].to_list()
     ntt_tasks_df = assign_staffs(merged_df, staffs)
     return ntt_tasks_df
+
+@st.cache_data
+def get_loan_tasks(users, business_df, df_transc_today):
+    business_df["business_key"] = business_df["Business"].str.lower().str.strip()
+    tm_data = df_transc_today[df_transc_today["target_met"] == True]
+    tm_data["business_key"] = tm_data["Business Name"].str.lower().str.strip()
+    tm_data = tm_data.sample(n=40, replace=False, ignore_index=True)
+
+    merged_df = tm_data.merge(
+        business_df[["business_key", "Phone"]],
+        on="business_key",
+        how="left"
+    ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
+    merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
+    staffs = users.loc[users["Staff_name"].isin(["Eunice Bamiro", "Kolawole Adeola"]), "Staff_name"].to_list()
+    # staffs = users["Staff_name"].to_list()
+    loan_tasks_df = assign_staffs(merged_df, staffs)
+    return loan_tasks_df
+    
