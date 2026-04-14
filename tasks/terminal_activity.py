@@ -3,13 +3,12 @@ from data.loader import load_data, load_businesses_users, get_ta_task
 
 users = load_businesses_users()["users"]
 business_df = load_businesses_users()["business"]
-df_transc_today = load_data()["df_transc_today"]
-ntt_today = load_data()["df_ntt_today"]
+agg_data = load_data()["agg_data"]
 
 st.title("Terminal Activity")
-st.write("Businesses not meeting Target")
+st.write("Businesses with cummulative payment less than weekly target")
 
-merged_df = get_ta_task(users, business_df, df_transc_today, ntt_today)
+merged_df = get_ta_task(users, business_df, agg_data)
 
 staff_dfs = {
     staff: df.reset_index(drop=True)
