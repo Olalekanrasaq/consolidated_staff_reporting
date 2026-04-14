@@ -15,7 +15,8 @@ def load_data():
         "bo_retention_today": conn.read(worksheet="bo_retention_today"),
         "bo_retention_yest": conn.read(worksheet="bo_retention_yest"),
         "cr_metrics": conn.read(worksheet="cr_metrics"),
-        "target_business_nos": conn.read(worksheet="target_business_nos")
+        "target_business_nos": conn.read(worksheet="target_business_nos"),
+        "agg_data": conn.read(worksheet="agg_data")
     }
 
 @st.cache_data(ttl=86400)
@@ -54,33 +55,48 @@ def assign_staffs(df, staffs):
     ]
     return df
 
-@st.cache_data
-def get_ta_task(users, business_df, df_transc_today, ntt_today):
-    ta_data = df_transc_today[df_transc_today["target_met"] == False] 
-    target_not_met = ta_data[["Business Name", "days_last_transact", "payment_vol", "payment_value"]]
+# @st.cache_data
+# def get_ta_task(users, business_df, df_transc_today, ntt_today):
+#     ta_data = df_transc_today[df_transc_today["target_met"] == False] 
+#     target_not_met = ta_data[["Business Name", "days_last_transact", "payment_vol", "payment_value"]]
     
-    ntt_today['business_key'] = ntt_today['Business Name'].str.lower().str.strip()
+#     ntt_today['business_key'] = ntt_today['Business Name'].str.lower().str.strip()
+#     business_df["business_key"] = business_df["Business"].str.lower().str.strip()
+#     target_not_met["business_key"] = target_not_met["Business Name"].str.lower().str.strip()
+
+#     target_not_met = (
+#     target_not_met[
+#         ~target_not_met['business_key'].isin(ntt_today['business_key'])
+#     ]
+#     .drop_duplicates(subset=['Business Name'])
+#     )
+
+#     merged_df = target_not_met.merge(
+#         business_df[["business_key", "Phone"]],
+#         on="business_key",
+#         how="left"
+#     ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
+#     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
+#     staffs = users.loc[users["Staff_name"] != "Okunlola Francis", "Staff_name"].to_list()
+#     # staffs = users["Staff_name"].to_list()
+#     ta_tasks_df = assign_staffs(merged_df, staffs)
+#     return ta_tasks_df
+
+@st.cache_data
+def get_ta_task(users, business_df, agg_data):
     business_df["business_key"] = business_df["Business"].str.lower().str.strip()
-    target_not_met["business_key"] = target_not_met["Business Name"].str.lower().str.strip()
+    agg_data["business_key"] = agg_data["business_name"].str.lower().str.strip()
 
-    target_not_met = (
-    target_not_met[
-        ~target_not_met['business_key'].isin(ntt_today['business_key'])
-    ]
-    .drop_duplicates(subset=['Business Name'])
-    )
-
-    merged_df = target_not_met.merge(
+    merged_df = agg_data.merge(
         business_df[["business_key", "Phone"]],
         on="business_key",
         how="left"
-    ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
+    ).drop(columns="business_key").drop_duplicates(subset=['terminal_serial'])
     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
     staffs = users.loc[users["Staff_name"] != "Okunlola Francis", "Staff_name"].to_list()
     # staffs = users["Staff_name"].to_list()
     ta_tasks_df = assign_staffs(merged_df, staffs)
     return ta_tasks_df
-
 
 @st.cache_data
 def get_retention_task(users, business_df, bo_retention_today):
