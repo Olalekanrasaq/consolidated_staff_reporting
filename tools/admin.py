@@ -9,9 +9,11 @@ users_df = load_businesses_users()["users"]
 @st.cache_data
 def update_ta_tasks():
     conn = st.connection("gsheets", type=GSheetsConnection)
-    df_transc_today = load_data()["df_transc_today"]
-    ntt_today = load_data()["df_ntt_today"]
-    ta_tasks_df = get_ta_task(users_df, business_df, df_transc_today, ntt_today)
+    # df_transc_today = load_data()["df_transc_today"]
+    # ntt_today = load_data()["df_ntt_today"]
+    # ta_tasks_df = get_ta_task(users_df, business_df, df_transc_today, ntt_today)
+    agg_data = load_data()["agg_data"]
+    ta_tasks_df = get_ta_task(users_df, business_df, agg_data)
     conn.update(worksheet="assigned_ta_task", data=ta_tasks_df)
 
 @st.cache_data
