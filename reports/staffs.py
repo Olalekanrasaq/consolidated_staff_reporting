@@ -32,7 +32,7 @@ def count_by_staff(df, staff_col="Staff_name", count_col_name="count"):
 # determine if a task assigned per staff is no more in today not meeting target data
 def get_completed_ta_tasks(assigned_tasks, df_transc_today):
     not_meeting_target = df_transc_today[df_transc_today["target_met"] == False]
-    assigned_tasks["business_key"] = assigned_tasks["Business Name"].str.lower().str.strip()
+    assigned_tasks["business_key"] = assigned_tasks["business_name"].str.lower().str.strip()
     not_meeting_target["business_key"] = not_meeting_target["Business Name"].str.lower().str.strip()
     merged_df = assigned_tasks.merge(
         not_meeting_target[["business_key"]],
