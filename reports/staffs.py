@@ -38,8 +38,8 @@ def get_completed_ta_tasks(assigned_tasks, df_transc_today):
         not_meeting_target[["business_key"]],
         on="business_key",
         how="inner"
-    ).drop(columns=["business_key", "days_last_transact", "Phone"]
-           ).drop_duplicates(subset=['Business Name']).rename(columns={"Assigned_staff": "Staff_name"})
+    ).drop(columns=["business_key", "cummulative_vol", "cummulative_value",	"target_remained", "Phone"]
+           ).drop_duplicates(subset=['business_name']).rename(columns={"Assigned_staff": "Staff_name"})
     return merged_df
 
 # determine if a task assigned per staff is no more in today not meeting target data
