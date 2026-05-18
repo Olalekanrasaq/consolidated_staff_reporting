@@ -65,7 +65,7 @@ login_page = st.Page(login, title="Log in", icon=":material/login:")
 logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
 
 dashboard = st.Page("reports/dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True)
-staffs = st.Page("reports/staffs.py", title="Staff reports", icon=":material/add_moderator:")
+# staffs = st.Page("reports/staffs.py", title="Staff reports", icon=":material/add_moderator:")
 
 bo_retention = st.Page("tasks/bo_retention.py", title="BO Retention", icon=":material/account_circle:")
 ntt = st.Page("tasks/ntt.py", title="Non-Transacting Terminals", icon=":material/add_alert:")
@@ -83,7 +83,8 @@ if st.session_state.logged_in:
     pg = st.navigation(
         {
             "Account": [logout_page],
-            "Reports": [dashboard, staffs],
+            "Reports": [dashboard],
+            # "Reports": [dashboard, staffs],
             "Tasks": [bo_retention, ntt, terminal_activity, loan_task],
             "Tools": [cards, loans, moniebooks, terminals, admin],
         }
