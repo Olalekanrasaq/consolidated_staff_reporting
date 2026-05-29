@@ -99,21 +99,22 @@ summarized_df["NTT_CR"] = (summarized_df["Assigned_NTT_Tasks"] - summarized_df["
 # remove okunlola francis from summarized df
 summarized_df = summarized_df[~summarized_df["Staff_name"].isin(["Okunlola Francis", "Oluwaseun"])]
 
-cols = ["Staff_name", "Loans", "Moniebooks", "Terminals", "Cards", "TA_CR", "Retention_CR", "NTT_CR"]
+# cols = ["Staff_name", "Loans", "Moniebooks", "Terminals", "Cards", "TA_CR", "Retention_CR", "NTT_CR"]
+cols = ["Staff_name", "TA_CR", "Retention_CR", "NTT_CR"]
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2 = st.columns(2)
 with col1:
     with st.container(border=True):
-        st.metric(":material/sell: Total Loans", f"{len(loans)}")
+        st.metric(":material/sell: Businesses Assigned to Staffs yesterday", f"{len(assigned_tasks)}")
 with col2:
     with st.container(border=True):
-        st.metric(":material/computer: Total Moniebooks", f"{len(moniebooks)}")
-with col3:
-    with st.container(border=True):
-        st.metric(":material/sell: Total Terminals", f"{len(terminals)}")
-with col4:
-    with st.container(border=True):
-        st.metric(":material/card_giftcard: Total Cards", f"{len(cards)}")
+        st.metric(":material/sell: Businesses Converted by Staffs", f"{summarized_df["TA_CR"].sum()}")
+# with col3:
+#     with st.container(border=True):
+#         st.metric(":material/computer: Total Terminals", f"{len(terminals)}")
+# with col4:
+#     with st.container(border=True):
+#         st.metric(":material/card_giftcard: Total Cards", f"{len(cards)}")
 
 st.caption(":material/addchart: :green[Staff Performance Summary]")
 st.dataframe(summarized_df[cols], hide_index=True, use_container_width=True)
