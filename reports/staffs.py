@@ -97,7 +97,7 @@ summarized_df["Retention_CR"] = (summarized_df["Assigned_Retention_Tasks"] - sum
 summarized_df["NTT_CR"] = (summarized_df["Assigned_NTT_Tasks"] - summarized_df["Completed_NTT_Tasks"])
 
 # remove okunlola francis from summarized df
-summarized_df = summarized_df[summarized_df["Staff_name"] != "Okunlola Francis"]
+summarized_df = summarized_df[~summarized_df["Staff_name"].isin(["Okunlola Francis", "Oluwaseun"])]
 
 cols = ["Staff_name", "Loans", "Moniebooks", "Terminals", "Cards", "TA_CR", "Retention_CR", "NTT_CR"]
 
