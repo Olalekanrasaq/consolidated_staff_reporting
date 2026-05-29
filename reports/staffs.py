@@ -105,7 +105,7 @@ cols = ["Staff_name", "TA_CR", "Retention_CR", "NTT_CR"]
 col1, col2 = st.columns(2)
 with col1:
     with st.container(border=True):
-        st.metric(":material/sell: Businesses Assigned to Staffs yesterday", f"{len(assigned_tasks)}")
+        st.metric(":material/sell: Businesses Assigned to Staffs yesterday", f"{len(assigned_ta_tasks)}")
 with col2:
     with st.container(border=True):
         st.metric(":material/sell: Businesses Converted by Staffs", f"{summarized_df["TA_CR"].sum()}")
