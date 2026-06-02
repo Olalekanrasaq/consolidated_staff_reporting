@@ -8,11 +8,12 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 users = load_businesses_users()["users"]
 business_df = load_businesses_users()["business"]
 df_transc = load_data()["df_transc_today"]
+qualify_loan = load_data()["qualify_loan"]
 
 st.title("Loans Target")
 st.write("Businesses targeted for loans")
 
-merged_df = get_loan_tasks(users, business_df, df_transc)
+merged_df = get_loan_tasks(users, business_df, df_transc, qualify_loan)
 
 staff_dfs = {
     staff: df.reset_index(drop=True)
