@@ -16,7 +16,8 @@ def load_data():
         "bo_retention_yest": conn.read(worksheet="bo_retention_yest"),
         "cr_metrics": conn.read(worksheet="cr_metrics"),
         "target_business_nos": conn.read(worksheet="target_business_nos"),
-        "agg_data": conn.read(worksheet="agg_data")
+        "agg_data": conn.read(worksheet="agg_data"),
+        "qualify_loan": conn.read(worksheet="prequalify_loan")
     }
 
 @st.cache_data(ttl=86400)
