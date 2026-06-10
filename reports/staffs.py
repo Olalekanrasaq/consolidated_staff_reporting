@@ -103,7 +103,7 @@ else:
     summarized_df["NTT_CR"] = (summarized_df["Assigned_NTT_Tasks"] - summarized_df["Completed_NTT_Tasks"])
     
     # remove okunlola francis from summarized df
-    summarized_df = summarized_df[~summarized_df["Staff_name"].isin(["Okunlola Francis", "Oluwaseun"])]
+    summarized_df = summarized_df[~summarized_df["Staff_name"].isin(["Okunlola Francis", "Oluwaseun", "Olayinka Seun"])]
     
     # cols = ["Staff_name", "Loans", "Moniebooks", "Terminals", "Cards", "TA_CR", "Retention_CR", "NTT_CR"]
     cols = ["Staff_name", "TA_CR", "Retention_CR", "NTT_CR"]
