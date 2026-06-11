@@ -94,7 +94,7 @@ def get_ta_task(users, business_df, agg_data):
         how="left"
     ).drop(columns="business_key").drop_duplicates(subset=['terminal_serial'])
     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
-    staffs = users.loc[~users["Staff_name"].isin(["Okunlola Francis", "Oluwaseun"]), "Staff_name"].to_list()
+    staffs = users.loc[~users["Staff_name"].isin(["Okunlola Francis", "Oluwaseun", "Oreoluwa"]), "Staff_name"].to_list()
     # staffs = users["Staff_name"].to_list()
     ta_tasks_df = assign_staffs(merged_df, staffs)
     return ta_tasks_df
@@ -110,7 +110,7 @@ def get_retention_task(users, business_df, bo_retention_today):
         how="left"
     ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
-    staffs = users.loc[~users["Staff_name"].isin(["Okunlola Francis", "Oluwaseun"]), "Staff_name"].to_list()
+    staffs = users.loc[~users["Staff_name"].isin(["Okunlola Francis", "Oluwaseun", "Oreoluwa"]), "Staff_name"].to_list()
     # staffs = users["Staff_name"].to_list()
     ret_tasks_df = assign_staffs(merged_df, staffs)
     return ret_tasks_df
