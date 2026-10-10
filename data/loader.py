@@ -15,7 +15,9 @@ def load_data():
         "bo_retention_today": conn.read(worksheet="bo_retention_today"),
         "bo_retention_yest": conn.read(worksheet="bo_retention_yest"),
         "cr_metrics": conn.read(worksheet="cr_metrics"),
-        "target_business_nos": conn.read(worksheet="target_business_nos")
+        "target_business_nos": conn.read(worksheet="target_business_nos"),
+        "agg_data": conn.read(worksheet="agg_data"),
+        "qualify_loan": conn.read(worksheet="prequalify_loan")
     }
 
 @st.cache_data(ttl=86400)
@@ -54,32 +56,48 @@ def assign_staffs(df, staffs):
     ]
     return df
 
-@st.cache_data
-def get_ta_task(users, business_df, df_transc_today, ntt_today):
-    ta_data = df_transc_today[df_transc_today["target_met"] == False] 
-    target_not_met = ta_data[["Business Name", "days_last_transact", "payment_vol", "payment_value"]]
+# @st.cache_data
+# def get_ta_task(users, business_df, df_transc_today, ntt_today):
+#     ta_data = df_transc_today[df_transc_today["target_met"] == False] 
+#     target_not_met = ta_data[["Business Name", "days_last_transact", "payment_vol", "payment_value"]]
     
-    ntt_today['business_key'] = ntt_today['Business Name'].str.lower().str.strip()
+#     ntt_today['business_key'] = ntt_today['Business Name'].str.lower().str.strip()
+#     business_df["business_key"] = business_df["Business"].str.lower().str.strip()
+#     target_not_met["business_key"] = target_not_met["Business Name"].str.lower().str.strip()
+
+#     target_not_met = (
+#     target_not_met[
+#         ~target_not_met['business_key'].isin(ntt_today['business_key'])
+#     ]
+#     .drop_duplicates(subset=['Business Name'])
+#     )
+
+#     merged_df = target_not_met.merge(
+#         business_df[["business_key", "Phone"]],
+#         on="business_key",
+#         how="left"
+#     ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
+#     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
+#     staffs = users.loc[users["Staff_name"] != "Okunlola Francis", "Staff_name"].to_list()
+#     # staffs = users["Staff_name"].to_list()
+#     ta_tasks_df = assign_staffs(merged_df, staffs)
+#     return ta_tasks_df
+
+@st.cache_data
+def get_ta_task(users, business_df, agg_data):
     business_df["business_key"] = business_df["Business"].str.lower().str.strip()
-    target_not_met["business_key"] = target_not_met["Business Name"].str.lower().str.strip()
+    agg_data["business_key"] = agg_data["business_name"].str.lower().str.strip()
 
-    target_not_met = (
-    target_not_met[
-        ~target_not_met['business_key'].isin(ntt_today['business_key'])
-    ]
-    .drop_duplicates(subset=['Business Name'])
-    )
-
-    merged_df = target_not_met.merge(
+    merged_df = agg_data.merge(
         business_df[["business_key", "Phone"]],
         on="business_key",
         how="left"
-    ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
+    ).drop(columns="business_key").drop_duplicates(subset=['terminal_serial'])
     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
-    staffs = users["Staff_name"].to_list()
+    staffs = users.loc[~users["Staff_name"].isin(["Okunlola Francis", "Oluwaseun", "Oreoluwa"]), "Staff_name"].to_list()
+    # staffs = users["Staff_name"].to_list()
     ta_tasks_df = assign_staffs(merged_df, staffs)
     return ta_tasks_df
-
 
 @st.cache_data
 def get_retention_task(users, business_df, bo_retention_today):
@@ -92,7 +110,8 @@ def get_retention_task(users, business_df, bo_retention_today):
         how="left"
     ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
-    staffs = users["Staff_name"].to_list()
+    staffs = users.loc[~users["Staff_name"].isin(["Okunlola Francis", "Oluwaseun", "Oreoluwa"]), "Staff_name"].to_list()
+    # staffs = users["Staff_name"].to_list()
     ret_tasks_df = assign_staffs(merged_df, staffs)
     return ret_tasks_df
 
@@ -107,6 +126,33 @@ def get_ntt_task(users, business_df, df_ntt_today):
         how="left"
     ).drop(columns="business_key").drop_duplicates(subset=['Business Name'])
     merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
-    staffs = users["Staff_name"].to_list()
+    staffs = users.loc[~users["Staff_name"].isin(["Okunlola Francis", "Oluwaseun"]), "Staff_name"].to_list()
+    # staffs = users["Staff_name"].to_list()
     ntt_tasks_df = assign_staffs(merged_df, staffs)
     return ntt_tasks_df
+
+@st.cache_data
+def get_loan_tasks(users, business_df, df_transc_today, qualify_loan):
+    business_df["business_key"] = business_df["Business"].str.lower().str.strip()
+    tm_data = df_transc_today[df_transc_today["target_met"] == True]
+    tm_data = tm_data[['Business Name', 'payment_value', 'payment_vol']]
+    tm_data["business_key"] = tm_data["Business Name"].str.lower().str.strip()
+    qualify_loan["business_key"] = qualify_loan["Business Name"].str.lower().str.strip()
+    tm_data = tm_data.sample(n=40, replace=False, ignore_index=True)
+
+    merged_df = tm_data.merge(
+        business_df[["business_key", "Phone"]],
+        on="business_key",
+        how="left"
+    ).drop_duplicates(subset=['Business Name'])
+    merged_df = merged_df.merge(
+        qualify_loan[["business_key", "Offer Range"]],
+         on="business_key",
+        how="left"
+    ).drop(columns="business_key")
+    merged_df["Phone"] = merged_df["Phone"].astype("Int64").astype(str).str.zfill(11)
+    staffs = users.loc[users["Staff_name"].isin(["Eunice Bamiro", "Kolawole Adeola"]), "Staff_name"].to_list()
+    # staffs = users["Staff_name"].to_list()
+    loan_tasks_df = assign_staffs(merged_df, staffs)
+    return loan_tasks_df
+    
