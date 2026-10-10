@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
-from data.loader import load_products, load_businesses_users
+from data.loader import load_products, load_businesses_users, load_data
 from streamlit_gsheets import GSheetsConnection
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 
+df_transc = load_data()["df_transc_today"]
 loans_df = load_products()["loans"]
 users_df = load_businesses_users()["users"]
 current_staff = st.session_state.get("staff_name")
